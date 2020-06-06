@@ -29,7 +29,7 @@ namespace commander.Controllers
             return Ok(_mapper.Map<IEnumerable<CommandReadDto>>(commandItems));
         }
         //GET api/commands/{id}
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name="GetCommandById")]
         public ActionResult <CommandReadDto> GetCommandById (int id)
         {
             var commandItem = _repository.GetCommandById(id);
@@ -38,6 +38,25 @@ namespace commander.Controllers
                 return Ok(_mapper.Map<CommandReadDto>(commandItem));
             }
             return NotFound();
+        }
+
+        //POST api/commands
+        [HttpPost]
+        public ActionResult <CommandReadDto> CreateCommand(CommandCreateDto payload)
+        {
+            // variable is a mapping between DTO payload and the model
+            var commandModel = _mapper.Map<Command>(payload);
+            // CreateCommand refers to the reposiotry, and it takes the mapping between dto payload and model
+            _repository.CreateCommand(commandModel);
+            // Saves changes to SQL database
+            _repository.SaveChanges();
+
+            // passes the model just created from mapping the payload to the create dto and reads it back through the read dto
+            var commandReadDto = _mapper.Map<CommandReadDto>(commandModel);
+
+            //return Ok(commandReadDto); this was old way, the createdatroute returns a 201 and a uri
+            return CreatedAtRoute(nameof(GetCommandById), new {id = commandReadDto.Id}, commandReadDto);
+
         }
     }
 }
