@@ -58,5 +58,27 @@ namespace commander.Controllers
             return CreatedAtRoute(nameof(GetCommandById), new {id = commandReadDto.Id}, commandReadDto);
 
         }
+
+        //PUT api/commands/{id}
+        [HttpPut("{id}")]
+        public ActionResult UpdateCommand(int id, CommandUpdateDto payload)
+        {
+            // Loads the model with info from the database
+            var commandModelFromRepo = _repository.GetCommandById(id);
+            // validates there was something for the id number
+            if (commandModelFromRepo == null)
+            {
+                return NotFound();
+            }
+            // maps the payload to the database model
+            _mapper.Map(payload, commandModelFromRepo);
+
+            // actually don't technically need to do this (good practice in case you switch out EF)
+            _repository.UpdateCommand(commandModelFromRepo);
+
+            _repository.SaveChanges();
+
+            return NoContent();
+        }
     }
 }
