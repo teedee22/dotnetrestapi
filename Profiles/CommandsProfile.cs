@@ -12,6 +12,7 @@ namespace commander.Profiles
             CreateMap<Command, Dtos.CommandReadDto>();
             CreateMap<CommandCreateDto, Command>();
             CreateMap<CommandUpdateDto, Command>();
+            CreateMap<Command, CommandUpdateDto>();
         }
 
     }

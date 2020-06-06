@@ -3,6 +3,7 @@ using AutoMapper;
 using commander.Data;
 using commander.Dtos;
 using commander.Models;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace commander.Controllers
@@ -72,6 +73,39 @@ namespace commander.Controllers
             }
             // maps the payload to the database model
             _mapper.Map(payload, commandModelFromRepo);
+
+            // actually don't technically need to do this (good practice in case you switch out EF)
+            _repository.UpdateCommand(commandModelFromRepo);
+
+            _repository.SaveChanges();
+
+            return NoContent();
+        }
+
+        //PATCH api/commands/{id}
+        [HttpPatch("{id}")]
+        public ActionResult PartialCommandUpdate(int id, JsonPatchDocument<CommandUpdateDto> patchDoc)
+        {
+            // Loads the model with info from the database
+            var commandModelFromRepo = _repository.GetCommandById(id);
+            // validates there was something for the id number
+            if (commandModelFromRepo == null)
+            {
+                return NotFound();
+            }
+
+            // Taking source model created above from id in uri and mapping it to command update data transfer model
+            var commandToPatch = _mapper.Map<CommandUpdateDto>(commandModelFromRepo);
+            // This is a package used to do the patch. patchDoc comes in as the payload
+            patchDoc.ApplyTo(commandToPatch, ModelState);
+
+            // Validation that the 
+            if (!TryValidateModel(commandToPatch))
+            {
+                return ValidationProblem(ModelState);
+            }
+            // maps the patched object back to the original model pulled from db
+            _mapper.Map(commandToPatch, commandModelFromRepo);
 
             // actually don't technically need to do this (good practice in case you switch out EF)
             _repository.UpdateCommand(commandModelFromRepo);
