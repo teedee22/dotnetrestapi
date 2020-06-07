@@ -1,0 +1,17 @@
+version: '3.5'
+services:
+    ms-sql-server:
+        hostname: ms-sql-server
+        image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+        environment:
+            ACCEPT_EULA: "Y"
+            SA_PASSWORD: "H4msterfun"
+            MSSQL_PID: Express
+        ports:
+            - "1432:1433"
+
+    colourapi:
+        image: teedee22/commander:latest
+        ports:
+            - "443:443"
+            - "8080:80"
