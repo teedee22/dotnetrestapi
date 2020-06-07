@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
+using commander.Models;
 
 namespace commander
 {
@@ -54,7 +55,7 @@ namespace commander
             {
                 app.UseDeveloperExceptionPage();
             }
-            //PrepDB.PrepPopulation(app);
+            PrepDB.PrepPopulation(app);
 
             app.UseHttpsRedirection();
 
